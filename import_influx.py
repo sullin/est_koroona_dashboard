@@ -65,8 +65,8 @@ def calc_norm(total, regions, cnt):
 	return ret
 
 
-# Arvutab R0, kasutades logaritmilist regressiooni; vaatab "window" pikkust akent
-def calc_r0(pos, window, transmission_delay):
+# Arvutab n-päeva kordajat (R0), kasutades logaritmilist regressiooni; vaatab "window" pikkust akent
+def calc_logest(pos, window, transmission_delay):
 	# https://stackoverflow.com/questions/55780106/how-to-mimic-excels-logest-function-in-python
 	# LOGEST from https://support.office.com/en-us/article/logest-function-f27462d8-3657-4030-866b-a272c1d18b4b
 	def func(x, b, m):
@@ -176,7 +176,8 @@ pos100k=calc_norm(pos, regions, 100000)
 # r0: seda saaks ennustada erinevate andmete pealt, tuleb teha kompromiss 
 # tulemuse mürasuse ja muutumiskiiruse vahelt.
 # Siin arvutan regressioni viimase 14 päeva haigete arvu viimase 7 punkti pealt.
-r0 = calc_r0(pos, 7, 7)
+r0 = calc_logest(pos, 7, 5)
+dailyinc = calc_logest(pos, 7, 1)
 
 # haigestumise hetk
 exposure = calc_exposure(daily, 7, 5)
@@ -224,6 +225,7 @@ else:
 	send_influx(pos, "pos", None)
 	send_influx(pos100k, "pos100k", None)
 	send_influx(r0, "r0", None)
+	send_influx(dailyinc, "dailyinc", None)
 	send_influx(exposure, "exposure", None)
 	send_influx(exposure100k, "exposure100k", None)
 
